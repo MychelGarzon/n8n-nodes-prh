@@ -1,14 +1,14 @@
 {
   "name": "n8n-nodes-prh",
   "version": "0.1.0",
-  "description": "",
+  "description": "n8n community node for the Finnish Patent and Registration Office (PRH) Digital Financial Statement (XBRL) open data API",
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/MychelGarzon/n8n-nodes-prh",
   "keywords": ["n8n-community-node-package"],
-  "author": { "name": "MychelGarzon", "email": "mtjomy17@gmail.com" },
+  "author": { "name": "MychelGarzon", "email": "mychel.garzon@gmail.com" },
   "repository": {
     "type": "git",
-    "url": "https://github.com/<...>/n8n-nodes-<...>.git"
+    "url": "https://github.com/MychelGarzon/n8n-nodes-prh.git"
   },
   "scripts": {
     "build": "n8n-node build",

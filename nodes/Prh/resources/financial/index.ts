@@ -1,4 +1,11 @@
-import type { INodeProperties } from 'n8n-workflow';
+import type {
+	DeclarativeRestApiSettings,
+	IExecutePaginationFunctions,
+	INodeExecutionData,
+	INodeProperties,
+	JsonObject,
+} from 'n8n-workflow';
+import { NodeApiError, sleep } from 'n8n-workflow';
 import { getFinancialsDescription } from './getFinancials';
 import { getAllFinancialsDescription } from './getAllFinancials';
 import { getAllStatementsDescription } from './getAllStatements';
@@ -20,11 +27,85 @@ const listOutputPostReceive = [
 	},
 ];
 
-// IMPORTANT: n8n's generic pagination does NOT automatically merge the
-// original request's query parameters into subsequent requests — only
-// what's explicitly listed in `request.qs` here is sent. Each
-// operation's own required parameters must be re-specified via
-// $parameter references, alongside the incrementing `page`.
+/**
+ * Custom pagination for the three list/search operations. Only invoked
+ * when "Return All" is on (via send.paginate). Builds each page's
+ * request from the original (correctly built) options, just overriding
+ * `page`, and stops once a page comes back empty.
+ *
+ * A custom function is used instead of n8n's built-in `generic`
+ * pagination type because that type did not reliably preserve the
+ * original request's other query parameters on continuation requests,
+ * confirmed via live testing against the real PRH API.
+ *
+ * Errors are caught and re-thrown as NodeApiError with a clearer,
+ * PRH-specific message:
+ * - 429: PRH's rate limit was hit despite the delay between pages
+ * - other errors: passed through with the page number that failed and
+ *   how many items were already retrieved, to make debugging a partial
+ *   "Return All" fetch easier
+ *
+ * Note: n8n's RoutingNode only calls operations.pagination (built-in or
+ * custom) when a parameter's routing.send.paginate is active. There is
+ * no equivalent extension point for a single, non-paginated request —
+ * confirmed via live testing — so this pattern only applies to
+ * operations that genuinely have a "Return All" toggle.
+ */
+async function paginateAllPages(
+	this: IExecutePaginationFunctions,
+	requestOptions: DeclarativeRestApiSettings.ResultOptions,
+): Promise<INodeExecutionData[]> {
+	const results: INodeExecutionData[] = [];
+	let page = 1;
+	const itemIndex = this.getItemIndex();
+
+	while (true) {
+		const pageOptions: DeclarativeRestApiSettings.ResultOptions = {
+			...requestOptions,
+			options: {
+				...requestOptions.options,
+				qs: {
+					...requestOptions.options.qs,
+					page,
+				},
+			},
+		};
+
+		let pageItems: INodeExecutionData[];
+		try {
+			pageItems = await this.makeRoutingRequest(pageOptions);
+		} catch (error) {
+			const statusCode =
+				(error as { statusCode?: number; response?: { statusCode?: number } }).statusCode ??
+				(error as { response?: { statusCode?: number } }).response?.statusCode;
+
+			if (statusCode === 429) {
+				throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
+					message: 'PRH API rate limit exceeded',
+					description: `Hit the rate limit while fetching page ${page} of "Return All" results. ${results.length} item(s) were successfully retrieved before this happened. Wait a moment and try again, or turn off "Return All" and fetch specific pages instead.`,
+					itemIndex,
+				});
+			}
+
+			throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
+				message: `PRH API request failed on page ${page}`,
+				description: `${results.length} item(s) were successfully retrieved from earlier pages before this error occurred.`,
+				itemIndex,
+			});
+		}
+
+		results.push(...pageItems);
+
+		if (pageItems.length === 0) {
+			break;
+		}
+
+		page += 1;
+		await sleep(500);
+	}
+
+	return results;
+}
 
 export const financialDescription: INodeProperties[] = [
 	{
@@ -51,18 +132,7 @@ export const financialDescription: INodeProperties[] = [
 						postReceive: listOutputPostReceive,
 					},
 					operations: {
-						pagination: {
-							type: 'generic',
-							properties: {
-								continue: '={{ $response.body.financials.length > 0 }}',
-								request: {
-									qs: {
-										businessId: '={{ $parameter["businessId"] }}',
-										page: '={{ $pageCount + 1 }}',
-									},
-								},
-							},
-						},
+						pagination: paginateAllPages,
 					},
 				},
 			},
@@ -81,18 +151,7 @@ export const financialDescription: INodeProperties[] = [
 						postReceive: listOutputPostReceive,
 					},
 					operations: {
-						pagination: {
-							type: 'generic',
-							properties: {
-								continue: '={{ $response.body.financials.length > 0 }}',
-								request: {
-									qs: {
-										financialDate: '={{ $parameter["financialDate"] }}',
-										page: '={{ $pageCount + 1 }}',
-									},
-								},
-							},
-						},
+						pagination: paginateAllPages,
 					},
 				},
 			},
@@ -111,19 +170,7 @@ export const financialDescription: INodeProperties[] = [
 						postReceive: listOutputPostReceive,
 					},
 					operations: {
-						pagination: {
-							type: 'generic',
-							properties: {
-								continue: '={{ $response.body.financials.length > 0 }}',
-								request: {
-									qs: {
-										registeredDateStart: '={{ $parameter["registeredDateStart"] }}',
-										registeredDateEnd: '={{ $parameter["registeredDateEnd"] }}',
-										page: '={{ $pageCount + 1 }}',
-									},
-								},
-							},
-						},
+						pagination: paginateAllPages,
 					},
 				},
 			},

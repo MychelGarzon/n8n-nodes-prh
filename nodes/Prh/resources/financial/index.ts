@@ -8,6 +8,27 @@ const showOnlyForFinancial = {
 	resource: ['financial'],
 };
 
+const listPagination = {
+	type: 'generic' as const,
+	properties: {
+		continue: '={{ $response.body.financials.length > 0 }}',
+		request: {
+			qs: {
+				page: '={{ $pageCount + 1 }}',
+			},
+		},
+	},
+};
+
+const listOutputPostReceive = [
+	{
+		type: 'rootProperty' as const,
+		properties: {
+			property: 'financials',
+		},
+	},
+];
+
 export const financialDescription: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -29,6 +50,12 @@ export const financialDescription: INodeProperties[] = [
 						method: 'GET',
 						url: '/financials',
 					},
+					output: {
+						postReceive: listOutputPostReceive,
+					},
+					operations: {
+						pagination: listPagination,
+					},
 				},
 			},
 			{
@@ -42,6 +69,12 @@ export const financialDescription: INodeProperties[] = [
 						method: 'GET',
 						url: '/all_financials',
 					},
+					output: {
+						postReceive: listOutputPostReceive,
+					},
+					operations: {
+						pagination: listPagination,
+					},
 				},
 			},
 			{
@@ -54,6 +87,12 @@ export const financialDescription: INodeProperties[] = [
 					request: {
 						method: 'GET',
 						url: '/all_financial_statements',
+					},
+					output: {
+						postReceive: listOutputPostReceive,
+					},
+					operations: {
+						pagination: listPagination,
 					},
 				},
 			},

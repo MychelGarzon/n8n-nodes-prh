@@ -40,6 +40,19 @@ export const getAllStatementsDescription: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Return All',
+		name: 'returnAll',
+		type: 'boolean',
+		default: false,
+		displayOptions: { show: showOnlyForGetAllStatements },
+		description: 'Whether to return all results or only up to a given limit',
+		routing: {
+			send: {
+				paginate: '={{ $value }}',
+			},
+		},
+	},
+	{
 		displayName: 'Page',
 		name: 'page',
 		type: 'number',
@@ -47,9 +60,13 @@ export const getAllStatementsDescription: INodeProperties[] = [
 		typeOptions: {
 			minValue: 1,
 		},
-		displayOptions: { show: showOnlyForGetAllStatements },
-		description:
-			'If the search returns more than 100 results, they are split across pages. Use this to request a specific page.',
+		displayOptions: {
+			show: {
+				...showOnlyForGetAllStatements,
+				returnAll: [false],
+			},
+		},
+		description: 'Results are returned 100 per page. Use this to request a specific page.',
 		routing: {
 			send: {
 				type: 'query',

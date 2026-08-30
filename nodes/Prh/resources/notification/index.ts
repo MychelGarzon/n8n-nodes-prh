@@ -9,6 +9,7 @@ import { NodeApiError, sleep } from 'n8n-workflow';
 import { getDescription } from './get';
 import { getByRecordNumberDescription } from './getByRecordNumber';
 import { searchDescription } from './search';
+import { getDescriptionDescription } from './getDescription';
 
 const showOnlyForNotification = {
 	resource: ['notification'],
@@ -16,22 +17,6 @@ const showOnlyForNotification = {
 
 const NOTICES_BASE_URL = 'https://avoindata.prh.fi/opendata-registerednotices-api/v3';
 
-/**
- * Custom pagination for Search (registered notifications root endpoint).
- * Mirrors the proven pattern from the Financial resource's pagination:
- * each search field has its own routing.send, so n8n has already built
- * the correct query string (name, businessId, location, date ranges —
- * whichever were filled in) into requestOptions.options.qs BEFORE this
- * function runs. We simply spread that and override `page`.
- *
- * A custom function (rather than n8n's built-in `generic` pagination
- * type) is used because that type does not reliably preserve query
- * parameters on continuation requests, confirmed via live testing.
- *
- * Confirmed via PRH's swagger docs: 50 results per page, no
- * totalResults-based way to know the last page in advance — same
- * "stop on empty page" pattern used for the Financial resource.
- */
 async function searchPagination(
 	this: IExecutePaginationFunctions,
 	requestOptions: DeclarativeRestApiSettings.ResultOptions,
@@ -148,10 +133,28 @@ export const notificationDescription: INodeProperties[] = [
 					},
 				},
 			},
+			{
+				name: 'Get Description',
+				value: 'getDescription',
+				action: 'Get a code list description',
+				description:
+					'Look up what a set of PRH register codes mean (e.g. company form codes, entry codes)',
+				routing: {
+					request: {
+						method: 'GET',
+						url: `${NOTICES_BASE_URL}/description`,
+						qs: {
+							code: '={{$parameter["code"]}}',
+							lang: '={{$parameter["lang"]}}',
+						},
+					},
+				},
+			},
 		],
 		default: 'get',
 	},
 	...getDescription,
 	...getByRecordNumberDescription,
 	...searchDescription,
+	...getDescriptionDescription,
 ];

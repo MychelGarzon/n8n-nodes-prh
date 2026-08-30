@@ -5,8 +5,13 @@
   "license": "MIT",
   "homepage": "https://github.com/MychelGarzon/n8n-nodes-prh",
   "keywords": [
-    "n8n-community-node-package"
-  ],
+  "n8n-community-node-package",
+  "prh",
+  "xbrl",
+  "finland",
+  "financial-statements",
+  "trade-register"
+],
   "author": {
     "name": "MychelGarzon",
     "email": "mychel.garzon@gmail.com"
@@ -22,7 +27,8 @@
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
     "release": "n8n-node release",
-    "prepublishOnly": "n8n-node prerelease"
+    "prepublishOnly": "n8n-node prerelease",
+    "test": "jest"
   },
   "files": [
     "dist"
@@ -40,7 +46,10 @@
     "eslint": "9.32.0",
     "prettier": "3.6.2",
     "release-it": "^19.0.4",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.12"
   },
   "peerDependencies": {
     "n8n-workflow": "*"

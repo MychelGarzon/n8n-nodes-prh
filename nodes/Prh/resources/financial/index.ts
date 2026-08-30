@@ -51,7 +51,7 @@ const listOutputPostReceive = [
  * confirmed via live testing — so this pattern only applies to
  * operations that genuinely have a "Return All" toggle.
  */
-async function paginateAllPages(
+export async function paginateAllPages(
 	this: IExecutePaginationFunctions,
 	requestOptions: DeclarativeRestApiSettings.ResultOptions,
 ): Promise<INodeExecutionData[]> {

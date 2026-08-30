@@ -29,7 +29,7 @@ The **Financial** resource supports these operations:
 - **Search All Financial Statements** — find all companies that filed a digital financial statement within a registration date range (data available from 1 July 2023 onward).
 - **Get Financial Statement** — get the full digital financial statement for a company and period, given a Business ID and the period end date. Returns the raw iXBRL XML document as a single `rawXbrl` field — pipe this into an XML or Code node if you need to extract specific values, since the underlying taxonomy uses coded element names rather than plain labels like "Revenue" or "Net Income."
 
-**Return All**: Get Financials, Search All Financials, and Search All Financial Statements each support a **Return All** toggle. When enabled, the node automatically pages through all results (100 per page) and returns them as a flat list. When disabled, you can request a specific page number.
+**Return All**: Get Financials, Search All Financials, and Search All Financial Statements each support a **Return All** toggle. When enabled, the node automatically pages through all results (100 per page, with a short delay between pages) and returns them as a flat list. When disabled, you can request a specific page number.
 
 ## Credentials
 
@@ -45,6 +45,8 @@ This node is useful for due diligence, vendor or customer credit checks, or auto
 
 A typical workflow: use **Get Financials** to find which periods a company has filed for, then feed a confirmed Business ID + period end date into **Get Financial Statement** to retrieve the full filing. Not every Finnish company has digital financial statements on file — smaller entities in particular may return no results.
 
+**Error handling**: Get Financials, Search All Financials, and Search All Financial Statements provide clear error messages if a rate limit is hit or a page fails while using Return All, including how many results were already retrieved. Get Financial Statement returns PRH's standard error response (e.g. HTTP 400) when no statement exists for the given Business ID and period — this is expected for companies without digital filings, or when the period end date doesn't match a real filed period exactly.
+
 ## Resources
 
 - [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
@@ -52,6 +54,7 @@ A typical workflow: use **Get Financials** to find which periods a company has f
 
 ## Version history
 
+- **0.3.x** — Replaced built-in pagination with a custom, tested pagination implementation for reliability. Added clear error messages for rate limits and request failures during Return All. Added unit tests.
 - **0.2.x** — Added Return All pagination support to list/search operations.
 - **0.2.0** — First functional release. Implements all four PRH Digital Financial Statement API operations: Get Financials, Search All Financials, Search All Financial Statements, and Get Financial Statement (raw XML).
 - **0.1.x** — Initial scaffold and name reservation on npm.

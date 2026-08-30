@@ -1,6 +1,7 @@
 import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
 import { financialDescription } from './resources/financial';
 import { notificationDescription } from './resources/notification';
+import { companyDescription } from './resources/company';
 
 export class Prh implements INodeType {
 	description: INodeTypeDescription = {
@@ -11,7 +12,7 @@ export class Prh implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description:
-			'Get Finnish company financial statement and registration data from the PRH (Finnish Patent and Registration Office) open data APIs',
+			'Get Finnish company financial, registration, and public notice data from the PRH (Finnish Patent and Registration Office) open data APIs',
 		defaults: {
 			name: 'PRH Financial Statements',
 		},
@@ -33,6 +34,10 @@ export class Prh implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
+						name: 'Company',
+						value: 'company',
+					},
+					{
 						name: 'Financial',
 						value: 'financial',
 					},
@@ -43,6 +48,7 @@ export class Prh implements INodeType {
 				],
 				default: 'financial',
 			},
+			...companyDescription,
 			...financialDescription,
 			...notificationDescription,
 		],

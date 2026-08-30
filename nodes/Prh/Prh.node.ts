@@ -1,5 +1,6 @@
 import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
-import { financialDescription } from './resources/financial/index';
+import { financialDescription } from './resources/financial';
+import { notificationDescription } from './resources/notification';
 
 export class Prh implements INodeType {
 	description: INodeTypeDescription = {
@@ -10,7 +11,7 @@ export class Prh implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description:
-			'Get Finnish company financial statement data from the PRH (Finnish Patent and Registration Office) Digital Financial Statement open data API',
+			'Get Finnish company financial statement and registration data from the PRH (Finnish Patent and Registration Office) open data APIs',
 		defaults: {
 			name: 'PRH Financial Statements',
 		},
@@ -19,7 +20,6 @@ export class Prh implements INodeType {
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [],
 		requestDefaults: {
-			baseURL: 'https://avoindata.prh.fi/opendata-xbrl-api/v3',
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
@@ -36,10 +36,15 @@ export class Prh implements INodeType {
 						name: 'Financial',
 						value: 'financial',
 					},
+					{
+						name: 'Notification',
+						value: 'notification',
+					},
 				],
 				default: 'financial',
 			},
 			...financialDescription,
+			...notificationDescription,
 		],
 	};
 }

@@ -15,9 +15,8 @@ const showOnlyForFinancial = {
 	resource: ['financial'],
 };
 
-// Flattens each page's nested `financials` array into individual n8n
-// output items, so results (across one page or all pages) come out as
-// a flat list rather than one item per page wrapper.
+const XBRL_BASE_URL = 'https://avoindata.prh.fi/opendata-xbrl-api/v3';
+
 const listOutputPostReceive = [
 	{
 		type: 'rootProperty' as const,
@@ -27,30 +26,6 @@ const listOutputPostReceive = [
 	},
 ];
 
-/**
- * Custom pagination for the three list/search operations. Only invoked
- * when "Return All" is on (via send.paginate). Builds each page's
- * request from the original (correctly built) options, just overriding
- * `page`, and stops once a page comes back empty.
- *
- * A custom function is used instead of n8n's built-in `generic`
- * pagination type because that type did not reliably preserve the
- * original request's other query parameters on continuation requests,
- * confirmed via live testing against the real PRH API.
- *
- * Errors are caught and re-thrown as NodeApiError with a clearer,
- * PRH-specific message:
- * - 429: PRH's rate limit was hit despite the delay between pages
- * - other errors: passed through with the page number that failed and
- *   how many items were already retrieved, to make debugging a partial
- *   "Return All" fetch easier
- *
- * Note: n8n's RoutingNode only calls operations.pagination (built-in or
- * custom) when a parameter's routing.send.paginate is active. There is
- * no equivalent extension point for a single, non-paginated request —
- * confirmed via live testing — so this pattern only applies to
- * operations that genuinely have a "Return All" toggle.
- */
 export async function paginateAllPages(
 	this: IExecutePaginationFunctions,
 	requestOptions: DeclarativeRestApiSettings.ResultOptions,
@@ -126,7 +101,7 @@ export const financialDescription: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '/financials',
+						url: `${XBRL_BASE_URL}/financials`,
 					},
 					output: {
 						postReceive: listOutputPostReceive,
@@ -145,7 +120,7 @@ export const financialDescription: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '/all_financials',
+						url: `${XBRL_BASE_URL}/all_financials`,
 					},
 					output: {
 						postReceive: listOutputPostReceive,
@@ -164,7 +139,7 @@ export const financialDescription: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '/all_financial_statements',
+						url: `${XBRL_BASE_URL}/all_financial_statements`,
 					},
 					output: {
 						postReceive: listOutputPostReceive,
@@ -183,7 +158,7 @@ export const financialDescription: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '/financial',
+						url: `${XBRL_BASE_URL}/financial`,
 						headers: {
 							Accept: 'text/xml',
 						},

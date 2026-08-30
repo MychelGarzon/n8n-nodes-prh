@@ -17,7 +17,7 @@ const showOnlyForNotification = {
 
 const NOTICES_BASE_URL = 'https://avoindata.prh.fi/opendata-registerednotices-api/v3';
 
-async function searchPagination(
+export async function searchPagination(
 	this: IExecutePaginationFunctions,
 	requestOptions: DeclarativeRestApiSettings.ResultOptions,
 ): Promise<INodeExecutionData[]> {

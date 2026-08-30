@@ -2,9 +2,9 @@
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MychelGarzon_n8n-nodes-prh&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=MychelGarzon_n8n-nodes-prh)
 
-This is an n8n community node. It lets you use the Finnish Patent and Registration Office (PRH) Digital Financial Statement (XBRL) open data API in your n8n workflows.
+This is an n8n community node. It lets you use two of the Finnish Patent and Registration Office (PRH) open data APIs in your n8n workflows: Digital Financial Statement (XBRL) data, and Registered Notices (company registration and public notice history).
 
-PRH's open data service provides financial statement data — filed periods, company search by period or registration date, and full digital financial statements — for Finnish companies that have filed using the iXBRL reporting language. The API is public and requires no authentication.
+Both APIs are public and require no authentication.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
 
@@ -22,18 +22,29 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 
-The **Financial** resource supports these operations:
+### Financial
+
+Access PRH's Digital Financial Statement (XBRL) data:
 
 - **Get Financials** — list the financial periods a company has filed digital statements for, given a Finnish Business ID.
 - **Search All Financials** — find all companies that filed a digital financial statement for a given period end date.
 - **Search All Financial Statements** — find all companies that filed a digital financial statement within a registration date range (data available from 1 July 2023 onward).
 - **Get Financial Statement** — get the full digital financial statement for a company and period, given a Business ID and the period end date. Returns the raw iXBRL XML document as a single `rawXbrl` field — pipe this into an XML or Code node if you need to extract specific values, since the underlying taxonomy uses coded element names rather than plain labels like "Revenue" or "Net Income."
 
-**Return All**: Get Financials, Search All Financials, and Search All Financial Statements each support a **Return All** toggle. When enabled, the node automatically pages through all results (100 per page, with a short delay between pages) and returns them as a flat list. When disabled, you can request a specific page number.
+### Notification
+
+Access PRH's Registered Notices data — company details, public notice history, and reference code lists:
+
+- **Get** — get a company's full details and public notice history by Business ID.
+- **Get By Record Number** — look up a specific public notice by its year and record number.
+- **Search** — search for companies by name, Business ID, location, company form, or registration/notification date ranges.
+- **Get Description** — look up what a set of PRH register codes mean (currently: Company Form and Entry Code lists), in English, Finnish, or Swedish.
+
+**Return All**: Get Financials, Search All Financials, Search All Financial Statements, and Search (Notification) each support a **Return All** toggle. When enabled, the node automatically pages through all results and returns them as a flat list, with a short delay between pages. When disabled, you can request a specific page number.
 
 ## Credentials
 
-No authentication is required. PRH's Digital Financial Statement API is public and open.
+No authentication is required. Both PRH open data APIs used by this node are public and open.
 
 ## Compatibility
 
@@ -41,20 +52,27 @@ Tested against n8n v1.x (Node.js 24+). No known version incompatibility issues a
 
 ## Usage
 
-This node is useful for due diligence, vendor or customer credit checks, or automating financial data collection for Finnish trade register entities.
+This node is useful for due diligence, vendor or customer credit checks, or automating financial and registration data collection for Finnish trade register entities.
 
-A typical workflow: use **Get Financials** to find which periods a company has filed for, then feed a confirmed Business ID + period end date into **Get Financial Statement** to retrieve the full filing. Not every Finnish company has digital financial statements on file — smaller entities in particular may return no results.
+Typical workflows:
 
-**Error handling**: Get Financials, Search All Financials, and Search All Financial Statements provide clear error messages if a rate limit is hit or a page fails while using Return All, including how many results were already retrieved. Get Financial Statement returns PRH's standard error response (e.g. HTTP 400) when no statement exists for the given Business ID and period — this is expected for companies without digital filings, or when the period end date doesn't match a real filed period exactly.
+- Use **Get Financials** to find which periods a company has filed for, then feed a confirmed Business ID + period end date into **Get Financial Statement** to retrieve the full filing.
+- Use **Search** (Notification) to find companies by name or location, then **Get** to retrieve their full public notice history.
+- Use **Get Description** to decode the entry codes and company form codes that appear throughout both resources' responses.
+
+Not every Finnish company has digital financial statements on file — smaller entities in particular may return no results from the Financial resource.
+
+**Error handling**: Get Financials, Search All Financials, Search All Financial Statements, and Search (Notification) provide clear error messages if a rate limit is hit or a page fails while using Return All, including how many results were already retrieved. Single-lookup operations (Get Financial Statement, Get, Get By Record Number, Get Description) return PRH's standard error response for failures — for example, an HTTP 400 when no financial statement exists for a given Business ID and period, which is expected for companies without digital filings.
 
 ## Resources
 
 - [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
 - [PRH Open Data — Digital Financial Statement API docs](https://avoindata.prh.fi/en/xbrl/swagger-ui)
+- [PRH Open Data — Registered Notices API docs](https://avoindata.prh.fi/en/krek/swagger-ui)
 
 ## Version history
 
-- **0.3.x** — Replaced built-in pagination with a custom, tested pagination implementation for reliability. Added clear error messages for rate limits and request failures during Return All. Added unit tests.
-- **0.2.x** — Added Return All pagination support to list/search operations.
+- **0.5.x** — Added the Notification resource (PRH Registered Notices API): Get, Get By Record Number, Search (with Return All pagination and Company Form filtering), and Get Description. Added test coverage for both resources' pagination logic.
+- **0.3.x** — Replaced built-in pagination with a custom, tested pagination implementation for reliability. Added clear error messages for rate limits and request failures during Return All.
 - **0.2.0** — First functional release. Implements all four PRH Digital Financial Statement API operations: Get Financials, Search All Financials, Search All Financial Statements, and Get Financial Statement (raw XML).
 - **0.1.x** — Initial scaffold and name reservation on npm.

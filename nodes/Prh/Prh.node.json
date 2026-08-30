@@ -4,14 +4,10 @@
 	"codexVersion": "1.0",
 	"categories": ["Development", "Developer Tools"],
 	"resources": {
-		"credentialDocumentation": [
-			{
-				"url": "https://github.com/org/repo?tab=readme-ov-file#credentials"
-			}
-		],
+		"credentialDocumentation": [],
 		"primaryDocumentation": [
 			{
-				"url": "https://github.com/org/repo?tab=readme-ov-file"
+				"url": "https://github.com/MychelGarzon/n8n-nodes-prh?tab=readme-ov-file"
 			}
 		]
 	}

@@ -1,18 +1,18 @@
 import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
-import { userDescription } from './resources/user';
-import { companyDescription } from './resources/company';
+import { financialDescription } from './resources/financial/index';
 
 export class Prh implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Prh',
+		displayName: 'PRH Financial Statements',
 		name: 'prh',
 		icon: { light: 'file:prh.svg', dark: 'file:prh.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Interact with the Prh API',
+		description:
+			'Get Finnish company financial statement data from the PRH (Finnish Patent and Registration Office) Digital Financial Statement open data API',
 		defaults: {
-			name: 'Prh',
+			name: 'PRH Financial Statements',
 		},
 		usableAsTool: true,
 		inputs: [NodeConnectionTypes.Main],
@@ -33,18 +33,13 @@ export class Prh implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'User',
-						value: 'user',
-					},
-					{
-						name: 'Company',
-						value: 'company',
+						name: 'Financial',
+						value: 'financial',
 					},
 				],
-				default: 'user',
+				default: 'financial',
 			},
-			...userDescription,
-			...companyDescription,
+			...financialDescription,
 		],
 	};
 }

@@ -18,7 +18,6 @@ export const searchDescription: INodeProperties[] = [
 			send: {
 				type: 'query',
 				property: 'name',
-				value: '={{ $value || undefined }}',
 			},
 		},
 	},
@@ -34,7 +33,6 @@ export const searchDescription: INodeProperties[] = [
 			send: {
 				type: 'query',
 				property: 'businessId',
-				value: '={{ $value || undefined }}',
 			},
 		},
 	},

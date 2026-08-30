@@ -12,7 +12,7 @@ export const getFinancialsDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: '2521859-1',
+		placeholder: '0100379-9',
 		displayOptions: { show: showOnlyForGetFinancials },
 		description: 'The Finnish Business ID (Y-tunnus) to search filed financial periods for',
 		routing: {

@@ -8,18 +8,9 @@ const showOnlyForFinancial = {
 	resource: ['financial'],
 };
 
-const listPagination = {
-	type: 'generic' as const,
-	properties: {
-		continue: '={{ $response.body.financials.length > 0 }}',
-		request: {
-			qs: {
-				page: '={{ $pageCount + 1 }}',
-			},
-		},
-	},
-};
-
+// Flattens each page's nested `financials` array into individual n8n
+// output items, so results (across one page or all pages) come out as
+// a flat list rather than one item per page wrapper.
 const listOutputPostReceive = [
 	{
 		type: 'rootProperty' as const,
@@ -28,6 +19,12 @@ const listOutputPostReceive = [
 		},
 	},
 ];
+
+// IMPORTANT: n8n's generic pagination does NOT automatically merge the
+// original request's query parameters into subsequent requests — only
+// what's explicitly listed in `request.qs` here is sent. Each
+// operation's own required parameters must be re-specified via
+// $parameter references, alongside the incrementing `page`.
 
 export const financialDescription: INodeProperties[] = [
 	{
@@ -54,7 +51,18 @@ export const financialDescription: INodeProperties[] = [
 						postReceive: listOutputPostReceive,
 					},
 					operations: {
-						pagination: listPagination,
+						pagination: {
+							type: 'generic',
+							properties: {
+								continue: '={{ $response.body.financials.length > 0 }}',
+								request: {
+									qs: {
+										businessId: '={{ $parameter["businessId"] }}',
+										page: '={{ $pageCount + 1 }}',
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -73,7 +81,18 @@ export const financialDescription: INodeProperties[] = [
 						postReceive: listOutputPostReceive,
 					},
 					operations: {
-						pagination: listPagination,
+						pagination: {
+							type: 'generic',
+							properties: {
+								continue: '={{ $response.body.financials.length > 0 }}',
+								request: {
+									qs: {
+										financialDate: '={{ $parameter["financialDate"] }}',
+										page: '={{ $pageCount + 1 }}',
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -92,7 +111,19 @@ export const financialDescription: INodeProperties[] = [
 						postReceive: listOutputPostReceive,
 					},
 					operations: {
-						pagination: listPagination,
+						pagination: {
+							type: 'generic',
+							properties: {
+								continue: '={{ $response.body.financials.length > 0 }}',
+								request: {
+									qs: {
+										registeredDateStart: '={{ $parameter["registeredDateStart"] }}',
+										registeredDateEnd: '={{ $parameter["registeredDateEnd"] }}',
+										page: '={{ $pageCount + 1 }}',
+									},
+								},
+							},
+						},
 					},
 				},
 			},

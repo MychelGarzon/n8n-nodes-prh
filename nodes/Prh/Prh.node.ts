@@ -14,7 +14,7 @@ export class Prh implements INodeType {
 		description:
 			'Get Finnish company financial, registration, and public notice data from the PRH (Finnish Patent and Registration Office) open data APIs',
 		defaults: {
-			name: 'PRH Financial Statements',
+			name: 'PRH Open Data',
 		},
 		usableAsTool: true,
 		inputs: [NodeConnectionTypes.Main],

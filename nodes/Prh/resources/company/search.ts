@@ -1,29 +1,4 @@
-import type { INodeProperties, IDisplayOptions } from 'n8n-workflow';
-
-function createQueryProperty(
-	displayName: string,
-	name: string,
-	placeholder: string,
-	description: string,
-	showOptions: IDisplayOptions['show'],
-): INodeProperties {
-	return {
-		displayName,
-		name,
-		type: 'string',
-		default: '',
-		placeholder,
-		displayOptions: { show: showOptions },
-		description,
-		routing: {
-			send: {
-				type: 'query',
-				property: name,
-				value: '={{ $value || undefined }}',
-			},
-		},
-	};
-}
+import type { INodeProperties } from 'n8n-workflow';
 
 const showOnlyForSearch = {
 	operation: ['search'],
@@ -31,20 +6,38 @@ const showOnlyForSearch = {
 };
 
 export const searchDescription: INodeProperties[] = [
-	createQueryProperty(
-		'Company Name',
-		'name',
-		'Nokia',
-		'A company name or a prefix of it',
-		showOnlyForSearch,
-	),
-	createQueryProperty(
-		'Business ID',
-		'businessId',
-		'0100379-9',
-		'A Finnish Business ID (Y-tunnus)',
-		showOnlyForSearch,
-	),
+	{
+		displayName: 'Company Name',
+		name: 'name',
+		type: 'string',
+		default: '',
+		placeholder: 'Nokia',
+		displayOptions: { show: showOnlyForSearch },
+		description: 'A company name or a prefix of it',
+		routing: {
+			send: {
+				type: 'query',
+				property: 'name',
+				value: '={{ $value || undefined }}',
+			},
+		},
+	},
+	{
+		displayName: 'Business ID',
+		name: 'businessId',
+		type: 'string',
+		default: '',
+		placeholder: '0100379-9',
+		displayOptions: { show: showOnlyForSearch },
+		description: 'A Finnish Business ID (Y-tunnus)',
+		routing: {
+			send: {
+				type: 'query',
+				property: 'businessId',
+				value: '={{ $value || undefined }}',
+			},
+		},
+	},
 	{
 		displayName: 'Return All',
 		name: 'returnAll',

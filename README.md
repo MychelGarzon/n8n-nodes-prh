@@ -73,17 +73,24 @@ Not every Finnish company has digital financial statements on file — smaller e
 
 ## Data license
 
-PRH's open data is published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode) (see also the [human-readable summary](https://creativecommons.org/licenses/by/4.0/)). Attribution required when displaying or republishing the data:
+PRH's open data — Digital Financial Statements, Registered Notices, and the Business Information System — is published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode) (see also the [human-readable summary](https://creativecommons.org/licenses/by/4.0/)). Data is digital, free of charge, and updated once daily by PRH. Attribution required when displaying or republishing the data:
 
-    Source PRH / avoindata.prh.fi, license CC 4.0 BY
+    Source PRH / avoindata.prh.fi, license CC BY 4.0
+
+Per PRH's terms, services built on this data must not use the PRH or Finnish Business Information System (YTJ) logos, nor otherwise mimic PRH's own services through a similar layout.
 
 This data is provided "as-is" without warranties of any kind, per the license terms.
 
-This node is free and open-source. If you plan to build a commercial product on top of PRH's data, review [PRH's Open Data terms](https://avoindata.prh.fi/en) directly.
+This node is free and open-source. Note the following scope limitations from PRH, which apply regardless of the license:
+
+- **Business Information System**: only companies registered or pending at the Finnish Trade Register are available. Details of private traders, and companies' email addresses or phone numbers, are not included.
+- **Registered Notifications**: only covers notifications registered since 7 November 2014. Notifications filed by private traders are not available.
+- **Digital Financial Statements**: only financial statements filed using the iXBRL reporting language are available — roughly 5% of all filings. Other financial statements can be purchased via PRH's [Virre Information Service](https://virre.prh.fi/novus/home?userLang=en). Using the financial statement details programmatically requires the [SBR taxonomy](https://www.avoindata.fi/data/en_GB/dataset/sbr-taksonomia-osakeyhtioiden-ja-saatioiden-paivitykset).
 
 ## Resources
 
 - [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+- [PRH Open Data — about the service](https://avoindata.prh.fi/en/)
 - [PRH Open Data — Digital Financial Statement API docs](https://avoindata.prh.fi/en/xbrl/swagger-ui)
 - [PRH Open Data — Registered Notices API docs](https://avoindata.prh.fi/en/krek/swagger-ui)
 - [PRH Open Data — Business Information System API docs](https://avoindata.prh.fi/en/ytj/swagger-ui)

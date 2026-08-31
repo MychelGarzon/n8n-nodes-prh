@@ -4,7 +4,7 @@ import type {
 	IExecutePaginationFunctions,
 	INodeExecutionData,
 } from 'n8n-workflow';
-import { paginateAllPages } from '../index';
+import { paginateByPage } from '../../../shared/GenericFunctions';
 
 jest.mock('n8n-workflow', () => {
 	const actual = jest.requireActual('n8n-workflow');
@@ -32,7 +32,7 @@ function baseRequestOptions(qs: IDataObject): DeclarativeRestApiSettings.ResultO
 	} as unknown as DeclarativeRestApiSettings.ResultOptions;
 }
 
-describe('paginateAllPages', () => {
+describe('paginateByPage (financial)', () => {
 	it('stops and aggregates results once a page returns no items', async () => {
 		const makeRoutingRequest = jest
 			.fn()
@@ -43,7 +43,7 @@ describe('paginateAllPages', () => {
 			.mockResolvedValueOnce([]);
 
 		const context = createMockContext(makeRoutingRequest);
-		const result = await paginateAllPages.call(
+		const result = await paginateByPage.call(
 			context,
 			baseRequestOptions({ businessId: '0100379-9' }),
 		);
@@ -56,7 +56,7 @@ describe('paginateAllPages', () => {
 		const makeRoutingRequest = jest.fn().mockResolvedValueOnce([]);
 		const context = createMockContext(makeRoutingRequest);
 
-		const result = await paginateAllPages.call(
+		const result = await paginateByPage.call(
 			context,
 			baseRequestOptions({ businessId: '2521859-1' }),
 		);
@@ -72,7 +72,7 @@ describe('paginateAllPages', () => {
 			.mockResolvedValueOnce([]);
 
 		const context = createMockContext(makeRoutingRequest);
-		await paginateAllPages.call(context, baseRequestOptions({ businessId: '0100379-9' }));
+		await paginateByPage.call(context, baseRequestOptions({ businessId: '0100379-9' }));
 
 		const firstCallOptions = makeRoutingRequest.mock.calls[0][0];
 		const secondCallOptions = makeRoutingRequest.mock.calls[1][0];
@@ -90,7 +90,7 @@ describe('paginateAllPages', () => {
 		const context = createMockContext(makeRoutingRequest);
 
 		await expect(
-			paginateAllPages.call(context, baseRequestOptions({ financialDate: '2024-12-31' })),
+			paginateByPage.call(context, baseRequestOptions({ financialDate: '2024-12-31' })),
 		).rejects.toThrow(/rate limit/i);
 	});
 
@@ -99,7 +99,7 @@ describe('paginateAllPages', () => {
 		const context = createMockContext(makeRoutingRequest);
 
 		await expect(
-			paginateAllPages.call(context, baseRequestOptions({ businessId: '0100379-9' })),
+			paginateByPage.call(context, baseRequestOptions({ businessId: '0100379-9' })),
 		).rejects.toThrow(/page 1/i);
 	});
 });

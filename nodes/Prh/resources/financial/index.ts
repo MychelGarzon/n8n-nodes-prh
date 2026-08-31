@@ -1,11 +1,5 @@
-import type {
-	DeclarativeRestApiSettings,
-	IExecutePaginationFunctions,
-	INodeExecutionData,
-	INodeProperties,
-	JsonObject,
-} from 'n8n-workflow';
-import { NodeApiError, sleep } from 'n8n-workflow';
+import type { INodeProperties } from 'n8n-workflow';
+import { paginateByPage } from '../../shared/GenericFunctions';
 import { getFinancialsDescription } from './getFinancials';
 import { getAllFinancialsDescription } from './getAllFinancials';
 import { getAllStatementsDescription } from './getAllStatements';
@@ -17,6 +11,9 @@ const showOnlyForFinancial = {
 
 const XBRL_BASE_URL = 'https://avoindata.prh.fi/opendata-xbrl-api/v3';
 
+// Flattens each page's nested `financials` array into individual n8n
+// output items, so results (across one page or all pages) come out as
+// a flat list rather than one item per page wrapper.
 const listOutputPostReceive = [
 	{
 		type: 'rootProperty' as const,
@@ -25,62 +22,6 @@ const listOutputPostReceive = [
 		},
 	},
 ];
-
-export async function paginateAllPages(
-	this: IExecutePaginationFunctions,
-	requestOptions: DeclarativeRestApiSettings.ResultOptions,
-): Promise<INodeExecutionData[]> {
-	const results: INodeExecutionData[] = [];
-	let page = 1;
-	const itemIndex = this.getItemIndex();
-
-	while (true) {
-		const pageOptions: DeclarativeRestApiSettings.ResultOptions = {
-			...requestOptions,
-			options: {
-				...requestOptions.options,
-				qs: {
-					...requestOptions.options.qs,
-					page,
-				},
-			},
-		};
-
-		let pageItems: INodeExecutionData[];
-		try {
-			pageItems = await this.makeRoutingRequest(pageOptions);
-		} catch (error) {
-			const statusCode =
-				(error as { statusCode?: number; response?: { statusCode?: number } }).statusCode ??
-				(error as { response?: { statusCode?: number } }).response?.statusCode;
-
-			if (statusCode === 429) {
-				throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
-					message: 'PRH API rate limit exceeded',
-					description: `Hit the rate limit while fetching page ${page} of "Return All" results. ${results.length} item(s) were successfully retrieved before this happened. Wait a moment and try again, or turn off "Return All" and fetch specific pages instead.`,
-					itemIndex,
-				});
-			}
-
-			throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
-				message: `PRH API request failed on page ${page}`,
-				description: `${results.length} item(s) were successfully retrieved from earlier pages before this error occurred.`,
-				itemIndex,
-			});
-		}
-
-		results.push(...pageItems);
-
-		if (pageItems.length === 0) {
-			break;
-		}
-
-		page += 1;
-		await sleep(500);
-	}
-
-	return results;
-}
 
 export const financialDescription: INodeProperties[] = [
 	{
@@ -107,7 +48,7 @@ export const financialDescription: INodeProperties[] = [
 						postReceive: listOutputPostReceive,
 					},
 					operations: {
-						pagination: paginateAllPages,
+						pagination: paginateByPage,
 					},
 				},
 			},
@@ -126,7 +67,7 @@ export const financialDescription: INodeProperties[] = [
 						postReceive: listOutputPostReceive,
 					},
 					operations: {
-						pagination: paginateAllPages,
+						pagination: paginateByPage,
 					},
 				},
 			},
@@ -145,7 +86,7 @@ export const financialDescription: INodeProperties[] = [
 						postReceive: listOutputPostReceive,
 					},
 					operations: {
-						pagination: paginateAllPages,
+						pagination: paginateByPage,
 					},
 				},
 			},

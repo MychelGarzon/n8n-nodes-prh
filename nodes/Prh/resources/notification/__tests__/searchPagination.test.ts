@@ -4,7 +4,7 @@ import type {
 	IExecutePaginationFunctions,
 	INodeExecutionData,
 } from 'n8n-workflow';
-import { searchPagination } from '../index';
+import { paginateByPage } from '../../../shared/GenericFunctions';
 
 jest.mock('n8n-workflow', () => {
 	const actual = jest.requireActual('n8n-workflow');
@@ -32,7 +32,7 @@ function baseRequestOptions(qs: IDataObject): DeclarativeRestApiSettings.ResultO
 	} as unknown as DeclarativeRestApiSettings.ResultOptions;
 }
 
-describe('searchPagination', () => {
+describe('paginateByPage (notification search)', () => {
 	it('preserves pre-built query parameters (e.g. businessId) while incrementing the page number', async () => {
 		const makeRoutingRequest = jest
 			.fn()
@@ -40,7 +40,7 @@ describe('searchPagination', () => {
 			.mockResolvedValueOnce([]);
 
 		const context = createMockContext(makeRoutingRequest);
-		await searchPagination.call(context, baseRequestOptions({ businessId: '0100379-9' }));
+		await paginateByPage.call(context, baseRequestOptions({ businessId: '0100379-9' }));
 
 		const firstCallOptions = makeRoutingRequest.mock.calls[0][0];
 		const secondCallOptions = makeRoutingRequest.mock.calls[1][0];
@@ -56,7 +56,7 @@ describe('searchPagination', () => {
 			.mockResolvedValueOnce([]);
 
 		const context = createMockContext(makeRoutingRequest);
-		await searchPagination.call(context, baseRequestOptions({ name: 'KW Catering' }));
+		await paginateByPage.call(context, baseRequestOptions({ name: 'KW Catering' }));
 
 		const firstCallOptions = makeRoutingRequest.mock.calls[0][0];
 		expect(firstCallOptions.options.qs).toEqual({ name: 'KW Catering', page: 1 });
@@ -69,7 +69,7 @@ describe('searchPagination', () => {
 			.mockResolvedValueOnce([]);
 
 		const context = createMockContext(makeRoutingRequest);
-		const result = await searchPagination.call(
+		const result = await paginateByPage.call(
 			context,
 			baseRequestOptions({ businessId: '0100379-9' }),
 		);
@@ -82,7 +82,7 @@ describe('searchPagination', () => {
 		const makeRoutingRequest = jest.fn().mockResolvedValueOnce([]);
 		const context = createMockContext(makeRoutingRequest);
 
-		const result = await searchPagination.call(
+		const result = await paginateByPage.call(
 			context,
 			baseRequestOptions({ name: 'NoSuchCompanyXYZ' }),
 		);
@@ -100,7 +100,7 @@ describe('searchPagination', () => {
 		const context = createMockContext(makeRoutingRequest);
 
 		await expect(
-			searchPagination.call(context, baseRequestOptions({ location: 'Helsinki' })),
+			paginateByPage.call(context, baseRequestOptions({ location: 'Helsinki' })),
 		).rejects.toThrow(/rate limit/i);
 	});
 
@@ -109,7 +109,7 @@ describe('searchPagination', () => {
 		const context = createMockContext(makeRoutingRequest);
 
 		await expect(
-			searchPagination.call(context, baseRequestOptions({ businessId: '0100379-9' })),
+			paginateByPage.call(context, baseRequestOptions({ businessId: '0100379-9' })),
 		).rejects.toThrow(/page 1/i);
 	});
 });

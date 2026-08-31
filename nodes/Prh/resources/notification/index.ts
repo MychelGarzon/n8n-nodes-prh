@@ -1,11 +1,5 @@
-import type {
-	DeclarativeRestApiSettings,
-	IExecutePaginationFunctions,
-	INodeExecutionData,
-	INodeProperties,
-	JsonObject,
-} from 'n8n-workflow';
-import { NodeApiError, sleep } from 'n8n-workflow';
+import type { INodeProperties } from 'n8n-workflow';
+import { paginateByPage } from '../../shared/GenericFunctions';
 import { getDescription } from './get';
 import { getByRecordNumberDescription } from './getByRecordNumber';
 import { searchDescription } from './search';
@@ -16,62 +10,6 @@ const showOnlyForNotification = {
 };
 
 const NOTICES_BASE_URL = 'https://avoindata.prh.fi/opendata-registerednotices-api/v3';
-
-export async function searchPagination(
-	this: IExecutePaginationFunctions,
-	requestOptions: DeclarativeRestApiSettings.ResultOptions,
-): Promise<INodeExecutionData[]> {
-	const itemIndex = this.getItemIndex();
-	const results: INodeExecutionData[] = [];
-	let page = 1;
-
-	while (true) {
-		const pageOptions: DeclarativeRestApiSettings.ResultOptions = {
-			...requestOptions,
-			options: {
-				...requestOptions.options,
-				qs: {
-					...requestOptions.options.qs,
-					page,
-				},
-			},
-		};
-
-		let pageItems: INodeExecutionData[];
-		try {
-			pageItems = await this.makeRoutingRequest(pageOptions);
-		} catch (error) {
-			const statusCode =
-				(error as { statusCode?: number; response?: { statusCode?: number } }).statusCode ??
-				(error as { response?: { statusCode?: number } }).response?.statusCode;
-
-			if (statusCode === 429) {
-				throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
-					message: 'PRH API rate limit exceeded',
-					description: `Hit the rate limit while fetching page ${page} of search results. ${results.length} item(s) were successfully retrieved before this happened. Wait a moment and try again, or turn off "Return All" and fetch specific pages instead.`,
-					itemIndex,
-				});
-			}
-
-			throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
-				message: `PRH API request failed on page ${page}`,
-				description: `${results.length} item(s) were successfully retrieved from earlier pages before this error occurred.`,
-				itemIndex,
-			});
-		}
-
-		results.push(...pageItems);
-
-		if (pageItems.length === 0) {
-			break;
-		}
-
-		page += 1;
-		await sleep(500);
-	}
-
-	return results;
-}
 
 export const notificationDescription: INodeProperties[] = [
 	{
@@ -129,7 +67,7 @@ export const notificationDescription: INodeProperties[] = [
 						],
 					},
 					operations: {
-						pagination: searchPagination,
+						pagination: paginateByPage,
 					},
 				},
 			},

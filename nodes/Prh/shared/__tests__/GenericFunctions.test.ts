@@ -39,17 +39,17 @@ describe('paginateByPage (shared across financial, notification, company resourc
 	it('preserves pre-built query parameters (e.g. businessId) while incrementing the page number', async () => {
 		const makeRoutingRequest = jest
 			.fn()
-			.mockResolvedValueOnce([makeItem({ businessId: { value: '0100379-9' } })])
+			.mockResolvedValueOnce([makeItem({ businessId: { value: 'e.g. 0100379-9' } })])
 			.mockResolvedValueOnce([]);
 
 		const context = createMockContext(makeRoutingRequest);
-		await paginateByPage.call(context, baseRequestOptions({ businessId: '0100379-9' }));
+		await paginateByPage.call(context, baseRequestOptions({ businessId: 'e.g. 0100379-9' }));
 
 		const firstCallOptions = makeRoutingRequest.mock.calls[0][0];
 		const secondCallOptions = makeRoutingRequest.mock.calls[1][0];
 
-		expect(firstCallOptions.options.qs).toEqual({ businessId: '0100379-9', page: 1 });
-		expect(secondCallOptions.options.qs).toEqual({ businessId: '0100379-9', page: 2 });
+		expect(firstCallOptions.options.qs).toEqual({ businessId: 'e.g. 0100379-9', page: 1 });
+		expect(secondCallOptions.options.qs).toEqual({ businessId: 'e.g. 0100379-9', page: 2 });
 	});
 
 	it('preserves a name search parameter across pages', async () => {
@@ -74,13 +74,13 @@ describe('paginateByPage (shared across financial, notification, company resourc
 	it('stops and aggregates results once a page returns no items', async () => {
 		const makeRoutingRequest = jest
 			.fn()
-			.mockResolvedValueOnce([makeItem({ businessId: { value: '0100379-9' } })])
+			.mockResolvedValueOnce([makeItem({ businessId: { value: 'e.g. 0100379-9' } })])
 			.mockResolvedValueOnce([]);
 
 		const context = createMockContext(makeRoutingRequest);
 		const result = await paginateByPage.call(
 			context,
-			baseRequestOptions({ businessId: '0100379-9' }),
+			baseRequestOptions({ businessId: 'e.g. 0100379-9' }),
 		);
 
 		expect(result).toHaveLength(1);
@@ -123,7 +123,7 @@ describe('paginateByPage (shared across financial, notification, company resourc
 	it('throws a clear rate-limit message on a 429, including items already retrieved', async () => {
 		const makeRoutingRequest = jest
 			.fn()
-			.mockResolvedValueOnce([makeItem({ businessId: { value: '0100379-9' } })])
+			.mockResolvedValueOnce([makeItem({ businessId: { value: 'e.g. 0100379-9' } })])
 			.mockRejectedValueOnce({ statusCode: 429 });
 
 		const context = createMockContext(makeRoutingRequest);
@@ -138,7 +138,7 @@ describe('paginateByPage (shared across financial, notification, company resourc
 		const context = createMockContext(makeRoutingRequest);
 
 		await expect(
-			paginateByPage.call(context, baseRequestOptions({ businessId: '0100379-9' })),
+			paginateByPage.call(context, baseRequestOptions({ businessId: 'e.g. 0100379-9' })),
 		).rejects.toThrow(/page 1/i);
 	});
 });

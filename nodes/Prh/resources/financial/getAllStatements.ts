@@ -12,7 +12,7 @@ export const getAllStatementsDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: '2024-01-01',
+		placeholder: 'e.g. 2024-01-01',
 		displayOptions: { show: showOnlyForGetAllStatements },
 		description:
 			'Start of the registration date range, in the format yyyy-mm-dd. Data is available from 1 July 2023 onward.',
@@ -29,7 +29,7 @@ export const getAllStatementsDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: '2024-12-31',
+		placeholder: 'e.g. 2024-12-31',
 		displayOptions: { show: showOnlyForGetAllStatements },
 		description: 'End of the registration date range, in the format yyyy-mm-dd',
 		routing: {

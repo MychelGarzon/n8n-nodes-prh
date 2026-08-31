@@ -12,7 +12,7 @@ export const getAllFinancialsDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: '2024-12-31',
+		placeholder: 'e.g. 2024-12-31',
 		displayOptions: { show: showOnlyForGetAllFinancials },
 		description:
 			'End date of the financial period to search for, in the format yyyy-mm-dd. Returns all companies that filed a digital financial statement for this period end date.',

@@ -5,7 +5,7 @@ import { companyDescription } from './resources/company';
 
 export class Prh implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'PRH Financial Statements',
+		displayName: 'PRH Open Data',
 		name: 'prh',
 		icon: { light: 'file:prh.svg', dark: 'file:prh.dark.svg' },
 		group: ['transform'],

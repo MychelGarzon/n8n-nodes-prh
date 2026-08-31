@@ -11,7 +11,7 @@ export const searchDescription: INodeProperties[] = [
 		name: 'name',
 		type: 'string',
 		default: '',
-		placeholder: 'Nokia',
+		placeholder: 'e.g. Nokia',
 		displayOptions: { show: showOnlyForSearch },
 		description: 'A company name or a prefix of it',
 		routing: {
@@ -27,7 +27,7 @@ export const searchDescription: INodeProperties[] = [
 		name: 'businessId',
 		type: 'string',
 		default: '',
-		placeholder: '0100379-9',
+		placeholder: 'e.g. 0100379-9',
 		displayOptions: { show: showOnlyForSearch },
 		description: 'A Finnish Business ID (Y-tunnus)',
 		routing: {

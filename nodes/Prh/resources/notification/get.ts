@@ -12,7 +12,7 @@ export const getDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: '0100379-9',
+		placeholder: 'e.g. 0100379-9',
 		displayOptions: { show: showOnlyForGet },
 		description:
 			'The Finnish Business ID (Y-tunnus) to look up company details and public notice history for',

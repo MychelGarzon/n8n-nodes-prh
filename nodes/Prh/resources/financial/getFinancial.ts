@@ -12,7 +12,7 @@ export const getFinancialDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: '0100379-9',
+		placeholder: 'e.g. 0100379-9',
 		displayOptions: { show: showOnlyForGetFinancial },
 		description: 'The Finnish Business ID (Y-tunnus) to fetch the financial statement for',
 		routing: {
@@ -28,7 +28,7 @@ export const getFinancialDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: '2024-12-31',
+		placeholder: 'e.g. 2024-12-31',
 		displayOptions: { show: showOnlyForGetFinancial },
 		description:
 			'End date of the financial period, in the format yyyy-mm-dd. Must match a period actually filed by this company — use the "Get Financials" operation first to find valid dates for a given Business ID.',

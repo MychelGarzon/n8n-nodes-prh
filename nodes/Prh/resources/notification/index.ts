@@ -16,13 +16,13 @@ const showOnlyForNotification = {
 
 const NOTICES_BASE_URL = 'https://avoindata.prh.fi/opendata-registerednotices-api/v3';
 
-function simplifyNotificationCompany(company: IDataObject): IDataObject {
+export function simplifyNotificationCompany(company: IDataObject): IDataObject {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { companyForms, registeredEntries, addresses, companySituations, euId, ...rest } = company;
 	return rest;
 }
 
-async function simplifyGetIfRequested(
+export async function simplifyGetIfRequested(
 	this: IExecuteSingleFunctions,
 	items: INodeExecutionData[],
 ): Promise<INodeExecutionData[]> {

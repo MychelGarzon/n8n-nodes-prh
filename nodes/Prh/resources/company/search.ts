@@ -73,4 +73,12 @@ export const searchDescription: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Simplify',
+		name: 'simplify',
+		type: 'boolean',
+		default: true,
+		displayOptions: { show: showOnlyForSearch },
+		description: 'Whether to return a simplified version of the response instead of the raw data',
+	},
 ];

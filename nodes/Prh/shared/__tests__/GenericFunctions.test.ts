@@ -4,7 +4,7 @@ import type {
 	IExecutePaginationFunctions,
 	INodeExecutionData,
 } from 'n8n-workflow';
-import { paginateByPage } from '../../../shared/GenericFunctions';
+import { paginateByPage } from '../GenericFunctions';
 
 jest.mock('n8n-workflow', () => {
 	const actual = jest.requireActual('n8n-workflow');
@@ -26,13 +26,16 @@ function createMockContext(makeRoutingRequest: jest.Mock) {
 	} as unknown as IExecutePaginationFunctions;
 }
 
-function baseRequestOptions(qs: IDataObject): DeclarativeRestApiSettings.ResultOptions {
+function baseRequestOptions(
+	qs: IDataObject,
+	url = 'https://avoindata.prh.fi/opendata-xbrl-api/v3',
+): DeclarativeRestApiSettings.ResultOptions {
 	return {
-		options: { url: 'https://avoindata.prh.fi/opendata-registerednotices-api/v3/', qs },
+		options: { url, qs },
 	} as unknown as DeclarativeRestApiSettings.ResultOptions;
 }
 
-describe('paginateByPage (notification search)', () => {
+describe('paginateByPage (shared across financial, notification, company resources)', () => {
 	it('preserves pre-built query parameters (e.g. businessId) while incrementing the page number', async () => {
 		const makeRoutingRequest = jest
 			.fn()
@@ -56,7 +59,13 @@ describe('paginateByPage (notification search)', () => {
 			.mockResolvedValueOnce([]);
 
 		const context = createMockContext(makeRoutingRequest);
-		await paginateByPage.call(context, baseRequestOptions({ name: 'KW Catering' }));
+		await paginateByPage.call(
+			context,
+			baseRequestOptions(
+				{ name: 'KW Catering' },
+				'https://avoindata.prh.fi/opendata-registerednotices-api/v3/',
+			),
+		);
 
 		const firstCallOptions = makeRoutingRequest.mock.calls[0][0];
 		expect(firstCallOptions.options.qs).toEqual({ name: 'KW Catering', page: 1 });
@@ -89,6 +98,26 @@ describe('paginateByPage (notification search)', () => {
 
 		expect(result).toEqual([]);
 		expect(makeRoutingRequest).toHaveBeenCalledTimes(1);
+	});
+
+	it('accumulates across variable page sizes (e.g. Company resource)', async () => {
+		const makeRoutingRequest = jest
+			.fn()
+			.mockResolvedValueOnce(Array.from({ length: 63 }, (_, i) => makeItem({ id: i })))
+			.mockResolvedValueOnce(Array.from({ length: 74 }, (_, i) => makeItem({ id: i + 63 })))
+			.mockResolvedValueOnce([]);
+
+		const context = createMockContext(makeRoutingRequest);
+		const result = await paginateByPage.call(
+			context,
+			baseRequestOptions(
+				{ name: 'Nokia' },
+				'https://avoindata.prh.fi/opendata-ytj-api/v3/companies',
+			),
+		);
+
+		expect(result).toHaveLength(137);
+		expect(makeRoutingRequest).toHaveBeenCalledTimes(3);
 	});
 
 	it('throws a clear rate-limit message on a 429, including items already retrieved', async () => {

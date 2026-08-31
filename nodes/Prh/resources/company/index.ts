@@ -22,12 +22,14 @@ function pickDescription(
 	return (match?.description as string) ?? (descriptions[0]?.description as string | undefined);
 }
 
-function simplifyCompany(company: IDataObject): IDataObject {
+export function simplifyCompany(company: IDataObject): IDataObject {
 	const names = (company.names as IDataObject[]) ?? [];
 	const currentName = names.find((n) => n.type === '1' && !n.endDate) ?? names[0];
 
 	const companyForms = (company.companyForms as IDataObject[]) ?? [];
 	const currentCompanyForm = companyForms.find((f) => !f.endDate) ?? companyForms[0];
+
+	const website = (company.website as IDataObject)?.url;
 
 	return {
 		businessId: (company.businessId as IDataObject)?.value,
@@ -39,12 +41,12 @@ function simplifyCompany(company: IDataObject): IDataObject {
 		status: company.status,
 		tradeRegisterStatus: company.tradeRegisterStatus,
 		registrationDate: company.registrationDate,
-		endDate: company.endDate,
-		website: (company.website as IDataObject)?.url,
+		...(company.endDate !== undefined && { endDate: company.endDate }),
+		...(website !== undefined && { website }),
 	};
 }
 
-async function simplifyIfRequested(
+export async function simplifyIfRequested(
 	this: IExecuteSingleFunctions,
 	items: INodeExecutionData[],
 ): Promise<INodeExecutionData[]> {

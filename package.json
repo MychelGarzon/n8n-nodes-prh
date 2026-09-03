@@ -1,5 +1,5 @@
 {
-  "name": "n8n-nodes-prh",
+"name": "n8n-nodes-prh",
   "version": "0.6.2",
   "description": "n8n community node for the Finnish Patent and Registration Office (PRH) Digital Financial Statement (XBRL) open data API",
   "license": "MIT",
